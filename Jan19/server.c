@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0)
 	{
-		error("Error opening socket");
+		error("An error occurred while creating a socket!");
 	}
 
 	bzero((char*) &serv_addr, sizeof(serv_addr));
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		error("Error on binding");
+		error("An error occurred while binding a socket!");
 	}
 
 	listen(sockfd, 5);
@@ -72,29 +72,25 @@ int main(int argc, char *argv[])
 		newsockfd1 = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 		if (newsockfd1 < 0)
 		{
-			error("Error on accept");
+			error("An error occurred while accepting connection!");
 		}
 
-        printf("Receiving a file name...\n");
-        recv(newsockfd1, file_name, sizeof(file_name), 0);
-        printf("File name is: %s\n", file_name);
-
-        /*newsockfd2 = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-		if (newsockfd2 < 0)
-		{
-			error("Error on accept");
-		}*/
+		printf("\n");
+		printf("Receiving a file name...\n");
+		recv(newsockfd1, file_name, sizeof(file_name), 0);
+		printf("File name is: %s\n", file_name);
+		printf("\n");
 
 		struct hostent *hst;
 		hst = gethostbyaddr((char*)&cli_addr.sin_addr, 4, AF_INET);
 
 		printf("Added %s [%s] new connection\n", (hst) ? hst->h_name : "Unknown host",
-		 (char*)inet_ntoa(cli_addr.sin_addr));
+		 	   (char*)inet_ntoa(cli_addr.sin_addr));
 
 		pid = fork();
 		if(pid < 0)
 		{
-			error("Error on fork");
+			error("An error occurred while creating a new parallel connection!");
 		}
 		if(pid == 0)
 		{
@@ -114,7 +110,7 @@ int main(int argc, char *argv[])
 
 void CopyFile (int sock, char *file_name)
 {
-    int piece_ctr = 0;
+	int piece_ctr = 0;
 	int bytes_recv;
 	char buff[1024];
 	nclients++;
@@ -124,33 +120,33 @@ void CopyFile (int sock, char *file_name)
 	file = fopen(file_name, "wb");
 	if (file == NULL)
 	{
-		error("Error creating file");
+		error("An error occurred while creating a file copy!");
 		return;
 	}
 
-    while(1)
-    {
-        bytes_recv = recv(sock, buff, sizeof(buff), 0);
-    
-        
-        if (bytes_recv < 0)
-        {
-            error("Error reading from socket!\n");
-            return;
-        }
+	while(1)
+	{
+		bytes_recv = recv(sock, buff, sizeof(buff), 0);
 
-        fwrite(buff, sizeof(char), bytes_recv, file);
-        ++piece_ctr;
-        printf("bytes_recv: %d bytes, segment: %d\n", bytes_recv, piece_ctr);
+		if (bytes_recv < 0)
+		{
+			error("An error occurred while reading from socket!\n");
+			return;
+		}
 
-        if(bytes_recv < sizeof(buff))
-        {
-            break;
-        }
-    }
+		fwrite(buff, sizeof(char), bytes_recv, file);
+		++piece_ctr;
+		printf("bytes_recv: %d bytes, segment: %d\n", bytes_recv, piece_ctr);
+
+		if(bytes_recv < sizeof(buff))
+		{
+			break;
+		}
+	}
 
 
 	nclients--;
+	printf("\n");
 	printf("-disconnecting\n");
 	printusers();
 	return;

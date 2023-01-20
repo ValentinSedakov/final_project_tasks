@@ -34,17 +34,18 @@ int main (int argc, char *argv[])
 
 	if(my_sock < 0)
 	{
-		error("Error opening socket");
+		error("An error occurred while creating a socket!");
 	}
 
 	server = gethostbyname(argv[1]);
 
 	if(server == NULL)
 	{
-		error("Error, no such host");
+		error("Error, such host does not exist!");
 	}
 
 	bzero((char*) &serv_addr, sizeof(serv_addr));
+
 	serv_addr.sin_family = AF_INET;
 
 	bcopy((char*)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
@@ -53,12 +54,13 @@ int main (int argc, char *argv[])
 
 	if(connect(my_sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		error("Error connecting");
+		error("An error occurred while establishing connection!");
 	}
 
-    printf("File name transmission...\n");
-    send(my_sock, argv[3], sizeof(argv[3]), 0);
-    printf("File name has been transmitted.\n");
+	printf("File name transmission...\n");
+	send(my_sock, argv[3], sizeof(argv[3]), 0);
+	printf("File name has been transmitted.\n");
+	printf("\n");
 
 	FILE* tran_file = fopen(argv[3], "rb");;
 	if(tran_file == NULL)
@@ -68,33 +70,34 @@ int main (int argc, char *argv[])
 	}
 
 	size_t read_piece;
-    long size_marker;
-    int piece_cnt = 1;
+	long size_marker;
+	int piece_cnt = 1;
 
- 	while(!feof(tran_file))
- 	{
- 		read_piece = fread(buff, sizeof(char), sizeof(buff), tran_file);
-        buff[read_piece] = 0;
+	while(!feof(tran_file))
+	{
+		read_piece = fread(buff, sizeof(char), sizeof(buff), tran_file);
+		buff[read_piece] = 0;
 
- 		if(read_piece < 0)
- 		{
- 			error("An error occurred while reading!\n");
- 			break;
- 		}
+		if(read_piece < 0)
+		{
+			error("An error occurred while reading a file segment!\n");
+			break;
+		}
 
-        size_marker = ftell(tran_file);
-        printf("bytes read: %zu bytes, segment: %d, read already: %ld bytes\n", read_piece,
-                piece_cnt, size_marker);
+		size_marker = ftell(tran_file);
+		printf("bytes read: %zu bytes, segment: %d, read already: %ld bytes\n", read_piece,
+				piece_cnt, size_marker);
 
- 		if(read_piece != 0)
-        {
-            send(my_sock, buff, read_piece, 0);
-            ++piece_cnt;
-        }
+		if(read_piece != 0)
+		{
+			send(my_sock, buff, read_piece, 0);
+			++piece_cnt;
+		}
 
- 	}
+	}
 
- 	printf("Done sending file...Disconnect...\n");
- 	close(my_sock);
- 	return 0;
+	printf("\n");
+	printf("The file has been successfully sent!  Disconnect...\n");
+	close(my_sock);
+	return 0;
 }
