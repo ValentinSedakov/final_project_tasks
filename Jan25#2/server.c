@@ -23,7 +23,7 @@ struct sock_attr_sv
 };
 
 void send_file(int);
-char* get_file_size(const char *);
+char *get_file_size(const char *);
 struct sock_attr_sv sock_creator_sv(struct sock_attr_sv *, char *);
 
 void error(const char *msg)
@@ -137,7 +137,7 @@ void send_file(int sock_d)
 
 	printf("Sending a file size...\n");
 	file_size = get_file_size(buff);
-	if(file_size == NULL)			//проверка размера файла, не более 4 Гб!
+	if (file_size == NULL) // проверка размера файла, не более 4 Гб!
 	{
 		return;
 	}
@@ -187,14 +187,14 @@ void send_file(int sock_d)
 	return;
 }
 
-char* get_file_size(const char *file_name)
+char *get_file_size(const char *file_name)
 {
 	int file_size = 0;
 	static char fl_sz_str[1024];
 	struct stat file_stat_buff;
 	int fd = open(file_name, O_RDONLY);
-	
-	if(fd == -1)
+
+	if (fd == -1)
 	{
 		file_size = -1;
 	}
@@ -210,7 +210,7 @@ char* get_file_size(const char *file_name)
 		}
 		close(fd);
 	}
-	if(file_size > ULONG_MAX)
+	if (file_size > ULONG_MAX)
 	{
 		printf("Forbidden file size! Max = 4Gb! Aborted!\n");
 		return NULL;

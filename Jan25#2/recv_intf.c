@@ -6,26 +6,25 @@ void error(const char *msg)
 	exit(-1);
 }
 
-void* loader_thr(void *arg)
+void *loader_thr(void *arg)
 {
-    struct to_thread in_thread = *(struct to_thread*)arg;
+	struct to_thread in_thread = *(struct to_thread *)arg;
 
-    in_thread.sock_for_th = sock_creator_cl(&in_thread.sock_for_th,
-                                             in_thread.loader_for_th.port_num,
-                                             in_thread.loader_for_th.serv_name);
+	in_thread.sock_for_th = sock_creator_cl(&in_thread.sock_for_th,
+											in_thread.loader_for_th.port_num,
+											in_thread.loader_for_th.serv_name);
 
 	if (connect(in_thread.sock_for_th.sock_ds,
-                (struct sockaddr *)&in_thread.sock_for_th.serv_addr,
-                sizeof(in_thread.sock_for_th.serv_addr)) < 0)
+				(struct sockaddr *)&in_thread.sock_for_th.serv_addr,
+				sizeof(in_thread.sock_for_th.serv_addr)) < 0)
 	{
 		error("An error occurred while establishing connection!");
 	}
 
 	pthread_mutex_lock(&(in_thread.loader_for_th.hide_from_serv));
-	recv_file(in_thread.sock_for_th.sock_ds, &in_thread.loader_for_th); //Во время получения файла, сервер не может
-	pthread_mutex_unlock(&(in_thread.loader_for_th.hide_from_serv));	//получить к нему доступ и, тем самым, помешать
-	pthread_exit(0);													//записи файла
-
+	recv_file(in_thread.sock_for_th.sock_ds, &in_thread.loader_for_th); // Во время получения файла, сервер не может
+	pthread_mutex_unlock(&(in_thread.loader_for_th.hide_from_serv));	// получить к нему доступ и, тем самым, помешать
+	pthread_exit(0);													// записи файла
 }
 void recv_file(int sock, struct loader *loader)
 {
@@ -45,7 +44,7 @@ void recv_file(int sock, struct loader *loader)
 	recv(sock, buff, sizeof(buff), 0);
 	file_size = strtoul(buff, NULL, 10);
 	printf("File size received: %lu\n", file_size);
-	
+
 	int num_of_segm = num_of_segs(file_size, sizeof(buff));
 	printf("%d segments (%zu bytes) in the file.\n", num_of_segm, sizeof(buff));
 	printf("\n");
@@ -73,8 +72,8 @@ void recv_file(int sock, struct loader *loader)
 		++piece_ctr;
 		loader->progress = (int)(100.0 * ((double)piece_ctr / (double)num_of_segm));
 		printf("bytes_recv: %d bytes, segment: %d/%d (%d %%)\n", bytes_recv, piece_ctr,
-				 num_of_segm, loader->progress);
-		
+			   num_of_segm, loader->progress);
+
 		printf("---------------------------------------------------------------\n");
 		printf("Test of load ready func:              %d\n", load_ready(&loader));
 		printf("---------------------------------------------------------------\n");
@@ -126,18 +125,18 @@ struct loader *start_load(struct file_name fl_nm)
 
 	pthread_mutex_init(&(loader->hide_from_serv), NULL);
 	struct to_thread to_trd;
-    to_trd.loader_for_th = *loader;
-    to_trd.sock_for_th = *sock;
-    
-    if(pthread_create(&loader->loader_th, NULL, &loader_thr, &to_trd) != 0)
-    {
-        error("An error occurred while clreating a loader thread!");
-    }
+	to_trd.loader_for_th = *loader;
+	to_trd.sock_for_th = *sock;
 
-    if(pthread_join(loader->loader_th, NULL) != 0)
-    {
-        error("An error occurred while joining a loader thread!");
-    }
+	if (pthread_create(&loader->loader_th, NULL, &loader_thr, &to_trd) != 0)
+	{
+		error("An error occurred while clreating a loader thread!");
+	}
+
+	if (pthread_join(loader->loader_th, NULL) != 0)
+	{
+		error("An error occurred while joining a loader thread!");
+	}
 
 	pthread_mutex_destroy(&(loader->hide_from_serv));
 
@@ -148,20 +147,20 @@ int num_of_segs(unsigned long file_sz, size_t seg_val)
 {
 	int num_of_segs;
 
-	if(file_sz % seg_val)
-    {
-        num_of_segs = ((file_sz / seg_val) + 1);
-    }
-    else
-    {
-        num_of_segs = (file_sz / seg_val);
-    }
+	if (file_sz % seg_val)
+	{
+		num_of_segs = ((file_sz / seg_val) + 1);
+	}
+	else
+	{
+		num_of_segs = (file_sz / seg_val);
+	}
 	return num_of_segs;
 }
 
 int load_ready(struct loader **loader)
 {
-	if(*loader == NULL)
+	if (*loader == NULL)
 	{
 		return -1;
 	}
@@ -170,11 +169,12 @@ int load_ready(struct loader **loader)
 
 void stop_loader(struct loader **loader)
 {
-    if(*loader == NULL){
-        return;
-    }
+	if (*loader == NULL)
+	{
+		return;
+	}
 
-	if(pthread_cancel((*loader)->loader_th) != 0)
+	if (pthread_cancel((*loader)->loader_th) != 0)
 	{
 		error("An error occurred while canceling a thread!");
 	}
@@ -184,7 +184,6 @@ void stop_loader(struct loader **loader)
 	}
 
 	pthread_mutex_destroy(&((*loader)->hide_from_serv));
-    free(*loader);
-    *loader = NULL;
+	free(*loader);
+	*loader = NULL;
 }
-
