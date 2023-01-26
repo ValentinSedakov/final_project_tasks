@@ -26,6 +26,8 @@ struct loader
 	char *port_num;
 	char *file_name;
 	int progress;
+	pthread_t loader_th;
+	pthread_mutex_t hide_from_serv; //закрываем доступ сервера к загружаемому в текущий момент клиентом файлу 
 
 	struct sock_attr_cl sock_attrs;
 };

@@ -21,8 +21,10 @@ void* loader_thr(void *arg)
 		error("An error occurred while establishing connection!");
 	}
 
-	recv_file(in_thread.sock_for_th.sock_ds, &in_thread.loader_for_th);
-	pthread_exit(0);
+	pthread_mutex_lock(&(in_thread.loader_for_th.hide_from_serv));
+	recv_file(in_thread.sock_for_th.sock_ds, &in_thread.loader_for_th); //Во время получения файла, сервер не может
+	pthread_mutex_unlock(&(in_thread.loader_for_th.hide_from_serv));	//получить к нему доступ и, тем самым, помешать
+	pthread_exit(0);													//записи файла
 
 }
 void recv_file(int sock, struct loader *loader)
@@ -122,20 +124,22 @@ struct loader *start_load(struct file_name fl_nm)
 
 	struct sock_attr_cl *sock = &(loader->sock_attrs);
 
-    struct to_thread to_trd;
+	pthread_mutex_init(&(loader->hide_from_serv), NULL);
+	struct to_thread to_trd;
     to_trd.loader_for_th = *loader;
     to_trd.sock_for_th = *sock;
     
-    pthread_t loader_th;
-    if(pthread_create(&loader_th, NULL, &loader_thr, &to_trd) != 0)
+    if(pthread_create(&loader->loader_th, NULL, &loader_thr, &to_trd) != 0)
     {
         error("An error occurred while clreating a loader thread!");
     }
 
-    if(pthread_join(loader_th, NULL) != 0)
+    if(pthread_join(loader->loader_th, NULL) != 0)
     {
         error("An error occurred while joining a loader thread!");
     }
+
+	pthread_mutex_destroy(&(loader->hide_from_serv));
 
 	return loader;
 }
@@ -169,6 +173,17 @@ void stop_loader(struct loader **loader)
     if(*loader == NULL){
         return;
     }
+
+	if(pthread_cancel((*loader)->loader_th) != 0)
+	{
+		error("An error occurred while canceling a thread!");
+	}
+	else
+	{
+		pthread_exit(0);
+	}
+
+	pthread_mutex_destroy(&((*loader)->hide_from_serv));
     free(*loader);
     *loader = NULL;
 }

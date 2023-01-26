@@ -142,7 +142,7 @@ void send_file(int sock_d)
 		return;
 	}
 	send(sock_d, file_size, sizeof(file_size), 0);
-	printf("File size sent. %s\n", buff);
+	printf("File size sent. %s bytes\n", file_size);
 	printf("\n");
 
 	FILE *tran_file = fopen(buff, "rb");
