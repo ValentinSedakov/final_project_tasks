@@ -10,9 +10,10 @@ void *loader_thr(void *arg)
 {
 	struct to_thread in_thread = *(struct to_thread *)arg;
 
-	in_thread.sock_for_th = sock_creator_cl(&in_thread.sock_for_th,
-											in_thread.loader_for_th.port_num,
-											in_thread.loader_for_th.serv_name);
+	in_thread.sock_for_th =
+		sock_creator_cl(&in_thread.sock_for_th,
+						in_thread.loader_for_th.port_num,
+						in_thread.loader_for_th.serv_name);
 
 	if (connect(in_thread.sock_for_th.sock_ds,
 				(struct sockaddr *)&in_thread.sock_for_th.serv_addr,
@@ -23,8 +24,9 @@ void *loader_thr(void *arg)
 
 	pthread_mutex_lock(&(in_thread.loader_for_th.hide_from_serv));
 	recv_file(in_thread.sock_for_th.sock_ds, &in_thread.loader_for_th); // Во время получения файла, сервер не может
-	pthread_mutex_unlock(&(in_thread.loader_for_th.hide_from_serv));	// получить к нему доступ и, тем самым, помешать
-	pthread_exit(0);													// записи файла
+	pthread_mutex_unlock(&(in_thread.loader_for_th.hide_from_serv));	// получить к нему доступ и, тем
+																		// самым, помешать записи файла
+	pthread_exit(0);
 }
 void recv_file(int sock, struct loader *loader)
 {
@@ -71,8 +73,8 @@ void recv_file(int sock, struct loader *loader)
 		fwrite(buff, sizeof(char), bytes_recv, file);
 		++piece_ctr;
 		loader->progress = (int)(100.0 * ((double)piece_ctr / (double)num_of_segm));
-		printf("bytes_recv: %d bytes, segment: %d/%d (%d %%)\n", bytes_recv, piece_ctr,
-			   num_of_segm, loader->progress);
+		printf("bytes_recv: %d bytes, segment: %d/%d (%d %%)\n", bytes_recv,
+			   piece_ctr, num_of_segm, loader->progress);
 
 		printf("---------------------------------------------------------------\n");
 		printf("Test of load ready func:              %d\n", load_ready(&loader));
@@ -90,7 +92,6 @@ struct sock_attr_cl sock_creator_cl(struct sock_attr_cl *sk_at,
 									char *str_portno,
 									char *str_host_nm)
 {
-
 	sk_at->portno = atoi(str_portno);
 	sk_at->sock_ds = socket(AF_INET, SOCK_STREAM, 0);
 	sk_at->server = gethostbyname(str_host_nm);
@@ -105,9 +106,15 @@ struct sock_attr_cl sock_creator_cl(struct sock_attr_cl *sk_at,
 		error("Error, such host does not exist!");
 	}
 
-	bzero((char *)&sk_at->serv_addr, sizeof(sk_at->serv_addr));
+	bzero((char *)&sk_at->serv_addr,
+		  sizeof(sk_at->serv_addr));
+
 	sk_at->serv_addr.sin_family = AF_INET;
-	bcopy((char *)sk_at->server->h_addr, (char *)&sk_at->serv_addr.sin_addr.s_addr, sk_at->server->h_length);
+
+	bcopy((char *)sk_at->server->h_addr,
+		  (char *)&sk_at->serv_addr.sin_addr.s_addr,
+		  sk_at->server->h_length);
+
 	sk_at->serv_addr.sin_port = htons(sk_at->portno);
 
 	return *sk_at;
