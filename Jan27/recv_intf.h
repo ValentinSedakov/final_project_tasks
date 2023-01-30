@@ -13,42 +13,42 @@
 
 struct sock_attr_cl
 {
-	int sock_ds;
-	int portno;
-	struct sockaddr_in serv_addr;
-	struct hostent *server;
+    int sock_ds;
+    int portno;
+    struct sockaddr_in serv_addr;
+    struct hostent *server;
 };
 
 struct loader
 {
-	char *serv_name;
-	char *port_num;
-	char *file_name;
-	int progress;
-	pthread_t loader_th;
-	pthread_mutex_t hide_from_serv; // закрываем доступ сервера к загружаемому в текущий момент клиентом файлу
+    char *serv_name;
+    char *port_num;
+    char *file_name;
+    int progress;
+    pthread_t loader_th;
+    pthread_mutex_t hide_from_serv; // закрываем доступ сервера к загружаемому в текущий момент клиентом файлу
 
-	struct sock_attr_cl sock_attrs;
+    struct sock_attr_cl sock_attrs;
 };
 
 struct user
 {
-	int i;
-	char *host_nm;
-	char *port_no;
+    int i;
+    char *host_nm;
+    char *port_no;
 };
 
 struct to_thread
 {
-	struct sock_attr_cl sock_for_th;
-	struct loader loader_for_th;
+    struct sock_attr_cl sock_for_th;
+    struct loader loader_for_th;
 };
 
 struct file_name
 {
-	struct user owner;
-	int i;
-	char *file_name;
+    struct user owner;
+    int i;
+    char *file_name;
 };
 
 void *loader_thr(void *);
