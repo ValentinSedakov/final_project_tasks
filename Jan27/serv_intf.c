@@ -106,20 +106,22 @@ void send_file(int sock_d)
 
 char *get_file_size(const char *file_name)
 {
-    int file_size = 0;
+    long long file_size = 0;
     static char fl_sz_str[1024];
     struct stat file_stat_buff;
     int fd = open(file_name, O_RDONLY);
 
     if (fd == -1)
     {
-        file_size = -1;
+        printf("File does not exist! Aborted!\n");
+        return NULL;
     }
     else
     {
         if ((fstat(fd, &file_stat_buff) != 0) || (!S_ISREG(file_stat_buff.st_mode)))
         {
-            file_size = -1;
+            printf("An error occurred while reading a file size! Aborted!\n");
+            return NULL;
         }
         else
         {
@@ -127,11 +129,11 @@ char *get_file_size(const char *file_name)
         }
         close(fd);
     }
-    if (file_size > ULONG_MAX)
+    if (file_size > MAX_FILE_SZ)
     {
         printf("Forbidden file size! Max = 4Gb! Aborted!\n");
         return NULL;
     }
-    sprintf(fl_sz_str, "%d", file_size);
+    sprintf(fl_sz_str, "%lli", file_size);
     return fl_sz_str;
 }

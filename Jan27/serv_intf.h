@@ -9,8 +9,8 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <limits.h>
 
+#define MAX_FILE_SZ 4294967295
 
 struct sock_attr_sv
 {

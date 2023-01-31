@@ -45,6 +45,13 @@ void recv_file(int sock, struct loader *loader)
     bzero(buff, sizeof(buff));
     recv(sock, buff, sizeof(buff), 0);
     file_size = strtoul(buff, NULL, 10);
+
+    if(0 >= file_size)
+    {
+        printf("File does not exist or size > 4Gb! Aborted!\n");
+        return;
+    }
+
     printf("File size received: %lu\n", file_size);
 
     int num_of_segm = num_of_segs(file_size, sizeof(buff));
@@ -75,10 +82,6 @@ void recv_file(int sock, struct loader *loader)
         loader->progress = (int)(100.0 * ((double)piece_ctr / (double)num_of_segm));
         printf("bytes_recv: %d bytes, segment: %d/%d (%d %%)\n", bytes_recv,
                piece_ctr, num_of_segm, loader->progress);
-
-        printf("---------------------------------------------------------------\n");
-        printf("Test of load ready func:              %d\n", load_ready(&loader));
-        printf("---------------------------------------------------------------\n");
 
         if (bytes_recv < sizeof(buff))
         {
