@@ -24,12 +24,6 @@ struct scaner
 {
     int i;
 };
-//юзер хранит всю инфу о пользователе, его ip и ник
-/*struct user
-{
-    int i;
-    char ip[16];
-};*/
 
 /*мои изменения*/
 static struct user myip; // структура которая хранит наш ip
@@ -197,15 +191,7 @@ if (test != NULL){
     return READY;
 
 }
-//тайбл хранит всё для связи с потоком который занимается получением списка доступный файлов 
-//и пользователя у которого этот спискок был запрошен
-//хранит имя файла и пользователя от которого это название пришло
-/*struct file_name
-{
-    struct user owner;
-    int i;
-    char file_name[255];
-};*/
+
 int size_file_name_list(struct file_name_list **head)
 {
     if (*head == NULL)
@@ -241,44 +227,6 @@ struct file_name *get_file_name(struct file_name_list **head, int num)
     }
     return NULL;
 }
-
-//лоадер хранит всё что нужно для связи с потоком-загрузчиком 
-/*struct loader
-{
-    char *serv_name;
-    int port_num;
-    char *file_name;
-    int progress;
-    pthread_t loader_th;
-    pthread_mutex_t hide_from_serv; // закрываем доступ сервера к загружаемому в текущий момент клиентом файлу
-    struct sock_attr_cl sock_attrs;
-};
-//запускает поток загрузчик, принимает имя файла для скачки и в нём есть и сам пользователь
-//возващает лоадер который хранит всё что нужно для связи с его потоком
-struct loader *start_load(struct file_name file_name)
-{
-    static int i = 0;
-    struct loader *loader = (struct loader *)malloc(sizeof(struct loader));
-    return loader;
-}
-//возвращает готовность загрузски 0-100, -1 - ошибка
-//должна срабатывать сразу, ничего не ждать
-int load_ready(struct loader **loader)
-{
-    if(*loader == NULL){
-        return -1;
-    }
-    return 100;
-}
-//убийство лоадера
-void stop_loader(struct loader **loader)
-{
-    if(*loader == NULL){
-        return;
-    }
-    free(*loader);
-    *loader = NULL;
-}*/
 
 struct queue_loaders
 {
@@ -441,7 +389,7 @@ void *host_scaner(void *arg)
     int size_broad = sizeof(scan_broadcast);
 
     // чето делаем
-    const ulong timeout = TIMESEC;
+    const unsigned long timeout = TIMESEC;
 
     struct timeval tv;
     tv.tv_sec = timeout;

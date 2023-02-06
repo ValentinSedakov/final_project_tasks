@@ -23,11 +23,13 @@ struct sock_attr_sv
     struct sockaddr_in cli_addr;
 };
 
+
+
 void error(const char *);
 void send_file(int);
 char *get_file_size(const char *);
 struct sock_attr_sv sock_creator_sv(struct sock_attr_sv *);
 struct sock_attr_sv sock_creator_names(struct sock_attr_sv *);
 
-void send_names(int, char *);
-char *get_filenames(char *);
+void send_names(int);
+char *get_filenames(void);

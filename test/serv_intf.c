@@ -156,7 +156,7 @@ char *get_file_size(const char *file_name)
     return fl_sz_str;
 }
 
-void send_names(int sock_send, char *path)
+void send_names(int sock_send)
 {
     char *filenames;
     char recv_line[16];
@@ -166,7 +166,7 @@ void send_names(int sock_send, char *path)
     printf("<%s>\n\n", recv_line);
 
     printf("sending filenames...\n");
-    filenames = get_filenames(path);
+    filenames = get_filenames();
     printf("filenames to send:\n%s", filenames);
     send(sock_send, filenames, strlen(filenames), 0);
     printf("filenames sent!\n");
@@ -174,9 +174,10 @@ void send_names(int sock_send, char *path)
     return;
 }
 
-char *get_filenames(char *path)
+char *get_filenames(void)
 {
     char filenames[2000];
+    char path[2] = "./";
     bzero(filenames, sizeof(filenames));
 
     DIR *directory = opendir(path);
@@ -209,4 +210,6 @@ char *get_filenames(char *path)
     closedir(directory);
     return to_send;
 }
+
+
 

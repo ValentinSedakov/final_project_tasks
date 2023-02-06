@@ -40,12 +40,12 @@ void recv_file(int sock, struct loader *loader)
     char buff[4096];
     size_t file_nm_sz = strlen(loader->file_name) * sizeof(char);
 
-    printf("File name transmission...\n");
+    //printf("File name transmission...\n");
     send(sock, loader->file_name, file_nm_sz, 0);
-    printf("File name has been transmitted.\n");
-    printf("\n");
+    //printf("File name has been transmitted.\n");
+    //printf("\n");
 
-    printf("Receiving a file size...\n");
+    //printf("Receiving a file size...\n");
     bzero(buff, sizeof(buff));
     recv(sock, buff, sizeof(buff), 0);
     file_size = strtoul(buff, NULL, 10);
@@ -56,11 +56,11 @@ void recv_file(int sock, struct loader *loader)
         return;
     }
 
-    printf("File size received: %lu\n", file_size);
+    //printf("File size received: %lu\n", file_size);
 
     int num_of_segm = num_of_segs(file_size, sizeof(buff));
-    printf("%d segments (%zu bytes) in the file.\n", num_of_segm, sizeof(buff));
-    printf("\n");
+    //printf("%d segments (%zu bytes) in the file.\n", num_of_segm, sizeof(buff));
+    //printf("\n");
 
     FILE *file;
     file = fopen(loader->file_name, "wb");
@@ -74,8 +74,8 @@ void recv_file(int sock, struct loader *loader)
     while (1)
     {
         bytes_recv = recv(sock, buff, sizeof(buff), 0);
-		printf("bytes_recv = %d", bytes_recv);
-		printf("buff = %s", buff);
+		//printf("bytes_recv = %d", bytes_recv);
+		//printf("buff = %s", buff);
 		//sleep(3);
         if (bytes_recv < 0)
         {
